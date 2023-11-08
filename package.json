@@ -1,0 +1,22 @@
+{
+    "name": "meli-price-tracker",
+    "version": "1.0.0",
+    "description": "A price tracker application for MercadoLibre.",
+    "main": "src/app.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "nodemon src/app.js"
+    },
+    "author": "Manuel Espinosa",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.17.1",
+        "mongoose": "^6.0.12",
+        "cors": "^2.8.5",
+        "dotenv": "^10.0.0"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.7"
+    }
+}
