@@ -10,26 +10,31 @@ const tokenManager = {
   async refreshAccessToken() {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
-      const response = await axios({
-        method: 'post',
-        url: process.env.MELI_AUTH_URL,
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        data: new URLSearchParams({
-          grant_type: process.env.GRANT_TYPE,
-          client_id: process.env.CLIENT_ID,
-          client_secret: process.env.CLIENT_SECRET,
-          code: process.env.AUTHORIZATION_CODE,
-          redirect_uri: process.env.REDIRECT_URI,
-          code_verifier: process.env.CODE_VERIFIER,
-        }),
-      });
+      try {
+        const response = await axios({
+          method: 'post',
+          url: process.env.MELI_AUTH_URL,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          data: new URLSearchParams({
+            grant_type: 'refresh_token',
+            client_id: process.env.CLIENT_ID,
+            client_secret: process.env.CLIENT_SECRET,
+            refresh_token: this.refreshToken,
+          }),
+        });
 
-      this.accessToken = response.data.access_token;
-      this.expiresIn = new Date().getTime() + response.data.expires_in * 1000;
-      this.isRefreshing = false;
-      this.onRrefreshed(this.accessToken);
+        this.accessToken = response.data.access_token;
+        this.refreshToken = response.data.refresh_token;
+        this.expiresIn = new Date().getTime() + response.data.expires_in * 1000;
+      } catch (error) {
+        console.error('Error refreshing access token:', error);
+        throw error;
+      } finally {
+        this.isRefreshing = false;
+        this.onRefreshed(this.accessToken);
+      }
     }
   },
 
@@ -37,7 +42,7 @@ const tokenManager = {
     this.subscribers.push(callback);
   },
 
-  onRrefreshed(accessToken) {
+  onRefreshed(accessToken) {
     this.subscribers.forEach((callback) => callback(accessToken));
     this.subscribers = [];
   },

@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance';
+import axiosInstance from './axiosInstance.js';
 
 const fetchProductPrices = async (productId) => {
   const response = await axiosInstance.get(`https://api.mercadolibre.com/items/${productId}/prices`);
