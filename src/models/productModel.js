@@ -7,6 +7,7 @@ const priceSchema = new mongoose.Schema({
   regular_amount: Number,
   currency_id: String,
   last_updated: Date,
+  trackedAt: { type: Date, default: Date.now },
   conditions: {
     context_restrictions: [String],
     start_time: Date,
