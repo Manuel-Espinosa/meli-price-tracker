@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import routes from './routes/index.js';
 import tokenManager from './config/tokenManager.js';
+import startPriceTrackingJob from './jobs/priceTrackingJob.js';
 
 
 dotenv.config();
@@ -17,6 +18,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api', routes);
+
+startPriceTrackingJob();
 
 const PORT = process.env.CONTAINER_APP_PORT || 3000;
 
