@@ -1,21 +1,46 @@
 import cron from 'node-cron';
 import Product from '../models/productModel';
 import fetchProductPrices from '../services/meliService';
+import { isPriceDifferent } from '../utils/priceUtils';
 
-cron.schedule('0 */6 * * *', async (productId) => { // Runs every 6 hours
-  const productId = productId;
+//0 */6 * * * runs every 6 hours
+
+cron.schedule('* * * * *', async () => { // Runs every 6 hours
+  console.log('Starting the scheduled price update job...');
   try {
-    const pricesData = await fetchProductPrices(productId);
-    await Product.findOneAndUpdate(
-      { id: productId },
-      { 
-        $push: { prices: { $each: pricesData.prices } },
-        $set: { trackedAt: new Date() }
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-    console.log(`Updated prices for product ${productId}`);
+    // Fetch all products from the database
+    const products = await Product.find({});
+    
+    console.log(`Found ${products.length} products to check for price updates.`);
+
+    for (const product of products) {
+      console.log(`Fetching prices for product ID: ${product.id}`);
+      const pricesData = await fetchProductPrices(product.id);
+      
+      console.log(`Fetched prices for product ID: ${product.id}`, pricesData.prices);
+      
+      // Determine if there are new or different prices to update
+      const pricesToUpdate = pricesData.prices.filter(fetchedPrice => {
+        const lastPrice = product.prices.find(p => p.type === fetchedPrice.type);
+        return !lastPrice || isPriceDifferent(fetchedPrice, lastPrice);
+      });
+
+      if (pricesToUpdate.length > 0) {
+        console.log(`Updating prices for product ID: ${product.id} with new prices: `, pricesToUpdate);
+        await Product.findOneAndUpdate(
+          { id: product.id },
+          { 
+            $push: { prices: { $each: pricesToUpdate } },
+            $set: { trackedAt: new Date() }
+          },
+          { new: true }
+        );
+        console.log(`Successfully updated prices for product ${product.id}`);
+      } else {
+        console.log(`No price change detected for product ID: ${product.id}. No update necessary.`);
+      }
+    }
   } catch (error) {
-    console.error(`Failed to update prices for product ${productId}: ${error}`);
+    console.error(`An error occurred during the price update job: ${error}`);
   }
 });

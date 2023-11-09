@@ -10,7 +10,7 @@ services:
     networks:
       - ${NETWORK}
     environment:
-      - MONGO_URI=mongodb://${DB_CONTAINER_NAME}:${DB_PORT}/${DB_NAME}
+      - MONGO_URI=mongodb://${DB_CONTAINER_NAME}:${DB_CONTAINER_PORT}/${DB_NAME}
     depends_on:
       - mongo
     env_file:
