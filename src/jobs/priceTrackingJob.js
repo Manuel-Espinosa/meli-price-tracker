@@ -5,7 +5,7 @@ import { isPriceDifferent } from "../utils/priceUtils.js";
 
 //0 */6 * * * runs every 6 hours
 const startPriceTrackingJob = () => {
-  cron.schedule("//0 */6 * * * ", async () => {
+  cron.schedule("0 */6 * * * ", async () => {
     // Runs every 6 hours
     console.log("Starting the scheduled price update job...");
     try {
