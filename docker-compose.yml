@@ -10,31 +10,14 @@ services:
     networks:
       - ${NETWORK}
     environment:
-      - MONGO_URI=mongodb://${DB_CONTAINER_NAME}:${DB_CONTAINER_PORT}/${DB_NAME}
-    depends_on:
-      - mongo
+      - MONGO_URI=${MONGO_URI}
     env_file:
       - .env
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run dev
 
-  mongo:
-    container_name: ${DB_CONTAINER_NAME}
-    image: mongo:latest
-    environment:
-      - MONGO_INITDB_DATABASE=${DB_NAME}
-    volumes:
-      - mongo-data:/data/db
-    ports:
-      - "${DB_LOCAL_PORT}:${DB_CONTAINER_PORT}"
-    networks:
-      - ${NETWORK}
 networks:
   backend:
     external:
       name: ${EXTERNAL_NETWORK}
-
-volumes:
-  mongo-data:
