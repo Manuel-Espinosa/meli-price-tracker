@@ -1,6 +1,9 @@
-import Product from '../models/productModel.js';
-import fetchProductPrices from '../services/meliService.js';
-import { isPriceDifferent } from '../utils/priceUtils.js';
+import Product from "../models/productModel.js";
+import {
+  fetchProductPrices,
+  fetchProductSpecs,
+} from "../services/meliService.js";
+import { isPriceDifferent } from "../utils/priceUtils.js";
 
 export const getProductPrices = async (req, res) => {
   const { productId } = req.params;
@@ -11,11 +14,11 @@ export const getProductPrices = async (req, res) => {
 
     if (product) {
       // Determine if there are new or different prices to update
-      const pricesToUpdate = fetchedPrices.prices.filter(fetchedPrice => {
+      const pricesToUpdate = fetchedPrices.prices.filter((fetchedPrice) => {
         const lastPrice = product.prices
           .slice() // Create a copy to avoid mutating the original array
           .sort((a, b) => new Date(b.trackedAt) - new Date(a.trackedAt)) // Sort by trackedAt descending
-          .find(p => p.type === fetchedPrice.type); // Find the latest price of the same type
+          .find((p) => p.type === fetchedPrice.type); // Find the latest price of the same type
 
         // If there is no last price recorded, or the amounts are different, consider it updated
         return !lastPrice || isPriceDifferent(fetchedPrice, lastPrice);
@@ -25,9 +28,9 @@ export const getProductPrices = async (req, res) => {
         // Update the product's prices if there are changes
         await Product.findOneAndUpdate(
           { id: productId },
-          { 
+          {
             $push: { prices: { $each: pricesToUpdate } },
-            $set: { trackedAt: new Date() }
+            $set: { trackedAt: new Date() },
           },
           { new: true }
         );
@@ -36,7 +39,7 @@ export const getProductPrices = async (req, res) => {
       // If product does not exist, create a new product entry with the fetched prices
       product = new Product({
         id: productId,
-        prices: fetchedPrices.prices
+        prices: fetchedPrices.prices,
       });
       await product.save();
     }
@@ -44,6 +47,22 @@ export const getProductPrices = async (req, res) => {
     res.json(product.prices);
   } catch (error) {
     console.error(`Error fetching prices for product ${productId}: ${error}`);
-    res.status(500).send('Error fetching product prices');
+    res.status(500).send("Error fetching product prices");
+  }
+};
+
+export const getProductSpecs = async (req, res, next) => {
+  const { productId } = req.params;
+  try {
+    const product = await fetchProductSpecs(productId);
+    const specs = product[0].body.attributes;
+    const transformedSpecs = specs.map((spec) => ({
+      spec: spec.name,
+      value: spec.value_name,
+    }));
+    res.status(200).json(transformedSpecs);
+  } catch (error) {
+    console.error(`Error fetching specs for product ${productId}: ${error}`);
+    res.status(500).send("Error fetching product specs");
   }
 };

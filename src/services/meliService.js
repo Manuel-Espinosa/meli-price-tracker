@@ -1,8 +1,16 @@
-import axiosInstance from './axiosInstance.js';
+import axiosInstance from "./axiosInstance.js";
 
-const fetchProductPrices = async (productId) => {
-  const response = await axiosInstance.get(`https://api.mercadolibre.com/items/${productId}/prices`);
+export const fetchProductPrices = async (productId) => {
+  const response = await axiosInstance.get(
+    `https://api.mercadolibre.com/items/${productId}/prices`
+  );
   return response.data;
 };
 
-export default fetchProductPrices;
+export const fetchProductSpecs = async (productId) => {
+  const queryParams = new URLSearchParams({ ids: productId }).toString();
+  const response = await axiosInstance.get(
+    `https://api.mercadolibre.com/items/?${queryParams}`
+  );
+  return response.data;
+};

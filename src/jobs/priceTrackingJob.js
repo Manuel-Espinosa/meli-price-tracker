@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import Product from "../models/productModel.js";
-import fetchProductPrices from "../services/meliService.js";
+import {fetchProductPrices} from "../services/meliService.js";
 import { isPriceDifferent } from "../utils/priceUtils.js";
 
 //0 */6 * * * runs every 6 hours
