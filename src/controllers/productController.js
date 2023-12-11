@@ -84,6 +84,7 @@ export const getProductID = async (req,res,next) => {
   const {productId} = req.params
   try {
     const identifier = await getProductIDService(productId)
+    console.log(`data from product ${productId} sended to client`)
     res.status(200).json(identifier)
   } catch (error) {
     console.error(`Error getting product id ${productId}: ${error}`);

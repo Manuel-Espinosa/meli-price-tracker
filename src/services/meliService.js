@@ -31,6 +31,6 @@ export const getProductIDService = async (productId) => {
   const response = await axiosInstance.get(
     `https://api.mercadolibre.com/items/${productId}?include_attributes=all`
   );
-  console.log(response.data)
+  console.log(`fetched data from product: ${productId}`)
   return response.data;
 };
