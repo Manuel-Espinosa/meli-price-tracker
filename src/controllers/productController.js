@@ -2,6 +2,8 @@ import Product from "../models/productModel.js";
 import {
   fetchProductPrices,
   fetchProductSpecs,
+  searchProductsService,
+  getProductIDService
 } from "../services/meliService.js";
 import { isPriceDifferent } from "../utils/priceUtils.js";
 
@@ -66,3 +68,25 @@ export const getProductSpecs = async (req, res, next) => {
     res.status(500).send("Error fetching product specs");
   }
 };
+
+export const searchProducts = async (req,res,next) => {
+  const {searchString} = req.params
+  try {
+    const searchResults = await searchProductsService(searchString)
+    res.status(200).json(searchResults)
+  } catch (error) {
+    console.error(`Error searching with search string ${searchString}: ${error}`);
+    res.status(500).send("Error searching products");
+  }
+}
+
+export const getProductID = async (req,res,next) => {
+  const {productId} = req.params
+  try {
+    const identifier = await getProductIDService(productId)
+    res.status(200).json(identifier)
+  } catch (error) {
+    console.error(`Error getting product id ${productId}: ${error}`);
+    res.status(500).send("Error getting ID");
+  }
+}
