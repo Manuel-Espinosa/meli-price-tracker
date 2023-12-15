@@ -54,15 +54,25 @@ export const getProductPrices = async (req, res) => {
 };
 
 export const getProductSpecs = async (req, res, next) => {
-  const { productId } = req.params;
+  const productId = req.params.productId;
   try {
     const product = await fetchProductSpecs(productId);
+    const prices = await fetchProductPrices(productId)
+    const extraData = await getProductIDService(productId)
     const specs = product[0].body.attributes;
     const transformedSpecs = specs.map((spec) => ({
       spec: spec.name,
       value: spec.value_name,
     }));
-    res.status(200).json(transformedSpecs);
+    const data = {
+      prices: prices,
+      specs:transformedSpecs,
+      title:extraData.title,
+      url:extraData.permalink,
+      store: "Mercado Libre"
+
+    }
+    res.status(200).json(data);
   } catch (error) {
     console.error(`Error fetching specs for product ${productId}: ${error}`);
     res.status(500).send("Error fetching product specs");

@@ -7,7 +7,7 @@ services:
     ports:
       - "${CONTAINER_APP_PORT}"
     deploy:
-      replicas: 3
+      replicas: 1
       endpoint_mode: dnsrr
     networks:
       - ${NETWORK}
