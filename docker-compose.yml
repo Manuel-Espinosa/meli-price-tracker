@@ -1,12 +1,14 @@
 version: '3.8'
 services:
-  app:
-    container_name: ${APP_CONTAINER_NAME}
+  meli-price-tracker:
     build: 
       context: .
       dockerfile: Dockerfile
     ports:
-      - "${LOCAL_APP_PORT}:${CONTAINER_APP_PORT}"
+      - "${CONTAINER_APP_PORT}"
+    deploy:
+      replicas: 5
+      endpoint_mode: dnsrr
     networks:
       - ${NETWORK}
     environment:
